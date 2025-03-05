@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Feature Web App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-con">
+        <div class="logo">
+          <a href="/">Face Demo  |</a>
+          <a href="/compare_face_page">|  CompareFace</a>
+
+          
+        </div>
+        
+      </div>
+    </div>
+  </nav>
+  
+  <h1>Face Feature Web App</h1>
+  <button id="OpenCamera">เปิดกล้อง</button>
+  <button id="CloseCamera" style="display: none;">ปิดกล้อง</button>
+  <video id="video" autoplay muted></video>
+  
+
+  
+  <div id="controls" style="display: none;">
+    <h3>Choose your Feature:</h3>
+    <label><input type="checkbox" id="faceRecognition"> Face Recognition</label><br>
+    <label><input type="checkbox" id="smileDetection"> Smile Detection</label><br>
+    <label><input type="checkbox" id="blinkDetection"> Blink Detection</label><br>
+    <label><input type="checkbox" id="headTurnDetection"> Head Turn Detection</label><br>
+    <label><input type="checkbox" id="headPoseEstimation"> Head Pose Estimation</label><br>
+    <div id="results"></div>
+  </div>
+  
+
+  
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
