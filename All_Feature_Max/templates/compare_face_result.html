@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ผลการเปรียบเทียบใบหน้า</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-con">
+        <div class="logo">
+          <a href="/">Face Demo  |</a>
+          <a href="/compare_face_page">|  CompareFace</a>
+          <a href="/upload">||  Upload</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <h1>ผลการเปรียบเทียบใบหน้า</h1>
+    <div id="result">
+      <div class="result-text">
+        <p>Similarity Score: {{ similarity }}</p>
+        <p>ผลลัพธ์: {{ result_text }}</p>
+      </div>
+      <div class="image-display">
+          <h3>ภาพใบหน้า 1</h3>
+          <img src="data:image/jpeg;base64,{{ image1 }}" alt="Face 1" style="max-width:300px;">
+      </div>
+      <div class="image-display">
+          <h3>ภาพใบหน้า 2</h3>
+          <img src="data:image/jpeg;base64,{{ image2 }}" alt="Face 2" style="max-width:300px;">
+      </div>
+    </div>
+    
+    
+    
+    <p><a href="{{ url_for('compare_face_page') }}">ลองเปรียบเทียบใหม่</a></p>
+  </div>
+  
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

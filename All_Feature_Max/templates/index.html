@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Feature Web App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-con">
+        <div class="logo">
+          <a href="/">Face Demo  |</a>
+          <a href="/compare_face_page">|  CompareFace</a>
+          <a href="/upload">||  Upload</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <h1>Face Feature Web App</h1>
+  
+  
+
+  <div id="controls">
+    <!-- ส่วนเลือก Feature -->
+    <div class="feature-selection">
+      <h3>Choose your Feature:</h3>
+      <label><input type="checkbox" id="faceRecognition"> Face Recognition</label><br>
+      <label><input type="checkbox" id="smileDetection"> Smile Detector</label><br>
+      <label><input type="checkbox" id="blinkDetection"> Blink Detector</label><br>
+      <label><input type="checkbox" id="headTurnDetection"> Head Turn Detector</label><br>
+      <label><input type="checkbox" id="headPoseEstimation"> Head Pose Estimation</label><br>
+      <label><input type="checkbox" id="antiSpoofingDetection"> Anti Spoofing Detector</label><br>
+      <label><input type="checkbox" id="glassesDetection"> Glasses Detector</label><br>
+      <label><input type="checkbox" id="maskDetection"> Mask Detector</label><br>
+      
+    </div>
+
+    <!-- ส่วนแสดงผลลัพธ์ -->
+    <div class="results-section">
+      <h3>Feature Results:</h3>
+      <div id="results"></div>
+    </div>
+  </div>
+  <button id="OpenCamera">เปิดกล้อง</button>
+  <button id="CloseCamera" style="display: none;">ปิดกล้อง</button>
+  <video id="video" autoplay muted></video>
+  
+
+
+  <div class group="container" style="display: flex; flex-direction: row; gap: 20px; margin-top: 20px; margin-bottom: 50px;">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+
+
+
+    
+  
+    
+  
+  
+  
+  <!-- Container สำหรับแสดงผลลัพธ์เรียงในแนวนอน -->
+  
+    
+  </div>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

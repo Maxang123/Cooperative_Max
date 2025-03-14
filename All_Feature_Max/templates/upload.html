@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Face</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-con">
+        <div class="logo">
+          <a href="/">Face Demo  |</a>
+          <a href="/compare_face_page">|  CompareFace</a>
+          <a href="/upload">||  Upload</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <h1>Upload Face</h1>
+  <form method="POST" enctype="multipart/form-data">
+    <label for="username">ชื่อ:</label>
+    <input type="text" name="username" id="username" required><br>
+    <label for="image">อัปโหลดรูปใบหน้า:</label>
+    <input type="file" name="image" id="image" accept="image/*" required><br>
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>

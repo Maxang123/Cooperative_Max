@@ -1,0 +1,130 @@
+หลักการเเละทฤษฎี
+1. การรู้จำใบหน้า (Face Recognition)
+การสกัด Feature (Embeddings):
+โดยใช้ไลบรารี InsightFace (อิงกับสถาปัตยกรรม ArcFace) ซึ่งทำงานบนพื้นฐานของ deep convolutional neural networks เพื่อสกัดลักษณะเฉพาะของใบหน้าให้กลายเป็นเวกเตอร์ใน embedding space
+การเปรียบเทียบใบหน้า:
+เมื่อได้ embedding ของใบหน้ามาแล้ว จะใช้ cosine similarity ในการวัดความคล้ายคลึงระหว่างเวกเตอร์ โดยถ้าค่าคล้ายคลึงสูงกว่า threshold ที่กำหนด (เช่น 0.6) ก็ถือว่ามีความเหมือนกัน
+2. การตรวจจับวัตถุ (Object Detection) ด้วย YOLO
+YOLO (You Only Look Once):
+เป็นอัลกอริทึมการตรวจจับวัตถุในภาพที่ทำงานในลักษณะ one-stage detector ซึ่งสามารถระบุ bounding box และ class ของวัตถุในภาพได้ในครั้งเดียว
+การประยุกต์ใช้ในโปรเจคนี้:
+Glasses Detection: ตรวจจับแว่นตาในใบหน้า
+Mask Detection: ตรวจจับว่าผู้ใช้งานใส่หน้ากากอนามัยหรือไม่
+Anti-Spoofing: ตรวจสอบว่าใบหน้าที่ปรากฏในภาพเป็นใบหน้าจริงหรือเป็นการปลอม (เช่น รูปถ่ายหรือหน้ากาก)
+3. การตรวจจับ Landmark ด้วย Mediapipe
+Face Mesh:
+Mediapipe face mesh จะตรวจจับ landmarks ของใบหน้าได้ถึง 468 จุด ซึ่งข้อมูลเหล่านี้ถูกนำไปใช้ในงานต่าง ๆ เช่น
+Smile Detection: คำนวณอัตราส่วนระหว่างความกว้างของปากและใบหน้าเพื่อประเมินว่ามีการยิ้มหรือไม่
+Blink Detection: ตรวจจับการกะพริบตาโดยวัดระยะห่างระหว่าง landmark บนและล่างของดวงตา
+Head Turn Detection และ Head Pose Estimation: ใช้ landmark ของจมูกและดวงตาในการคำนวณว่าหัวถูกหมุนหรือเอียงในทิศทางใด โดยใช้เทคนิคเช่น solvePnP จาก OpenCV เพื่อคำนวณมุมของหัว (pitch, yaw, roll)
+4. Anti-Spoofing Detection
+แนวคิด:
+เพื่อตรวจสอบว่าภาพใบหน้าที่ได้รับมาเป็นของจริงหรือเป็นการปลอมแปลง (เช่น รูปถ่ายที่นำมาใช้แทนการแสดงตัวจริง) โดยโมเดล YOLO จะตรวจจับ label ที่เกี่ยวข้องกับ “real” หรือ “fake”
+ประโยชน์:
+เพิ่มความปลอดภัยในการยืนยันตัวตนโดยลดความเสี่ยงจากการใช้ภาพปลอม
+===============================================================
+ ตั้งค่าและรันโปรเจค
+ปรับการตั้งค่า (ถ้าจำเป็น)
+
+ตรวจสอบและปรับค่า path ของโมเดลในโค้ดให้ถูกต้อง
+หากใช้งาน GPU ใน InsightFace ให้แน่ใจว่า environment ของคุณรองรับการใช้งาน GPU (ติดตั้ง CUDA และ cuDNN ตามที่ต้องการ) หากใช้ CPU ให้เปลี่ยน ctx_id=-1 ใน face_app.prepare()
+รันแอปพลิเคชัน
+หากไฟล์หลักของโปรเจคชื่อ app.py ให้รันคำสั่ง:
+python app.py
+
+===============================================================
+
+1. การนำเข้าไลบรารีและการตั้งค่าเริ่มต้น
+ไลบรารีพื้นฐาน:
+นำเข้า cv2 (OpenCV) สำหรับประมวลผลภาพ, numpy สำหรับคำนวณทางคณิตศาสตร์, pickle สำหรับการจัดการกับไฟล์ข้อมูล (เช่น embeddings), base64 สำหรับเข้ารหัส/ถอดรหัสภาพ, และ time รวมถึง os สำหรับการจัดการระบบไฟล์
+
+Flask:
+นำเข้า Flask และฟังก์ชันที่เกี่ยวข้อง เช่น render_template, request, jsonify, redirect, url_for เพื่อสร้าง web interface
+
+InsightFace และ YOLO:
+ใช้ insightface.app.FaceAnalysis สำหรับตรวจจับและสกัดคุณลักษณะ (embedding) ของใบหน้า
+ส่วน YOLO (จาก ultralytics) ถูกใช้ในโมเดลสำหรับตรวจจับแว่นตา, หน้ากากอนามัย (mask), และการตรวจจับ anti-spoofing
+
+Mediapipe:
+ใช้สำหรับสร้าง face mesh (ตรวจจับ landmark ของใบหน้า) และตรวจจับมือ
+
+2. การเตรียมโมเดลและตัวแปรพื้นฐาน
+InsightFace FaceAnalysis:
+โมเดลนี้ถูกเตรียมเพื่อใช้ในการตรวจจับใบหน้าและสกัด embedding ซึ่งใช้สำหรับเปรียบเทียบใบหน้ากัน
+
+YOLO Models:
+
+โมเดลสำหรับตรวจจับแว่นตา
+โมเดลสำหรับตรวจจับหน้ากากอนามัย
+โมเดลสำหรับตรวจจับ anti-spoofing (ตรวจสอบว่าภาพเป็นของจริงหรือเป็นการปลอมแปลง)
+Mediapipe Face Mesh & Hands:
+ตั้งค่าเพื่อใช้ในการตรวจจับ landmarks สำหรับงานอย่าง smile detection, blink detection, head turn detection, และ head pose estimation
+
+3. ฟังก์ชันประมวลผลแต่ละ Feature
+Anti-Spoofing Detection (process_anti_spoofing):
+ใช้ YOLO anti-spoofing model เพื่อตรวจสอบว่าภาพใบหน้ามาจากบุคคลจริงหรือเป็นการปลอมแปลง
+
+ถ้าเจอ label "fake" จะคืนค่า "Spoof Detected"
+ถ้าเจอ label "real" จะคืนค่า "Live"
+Glasses Detection (process_glasses_detection):
+ใช้ YOLO model ตรวจจับแว่นตาในภาพ โดยจะตรวจสอบ label ของวัตถุที่ตรวจพบ
+
+Mask Detection (process_mask_detection):
+ใช้ YOLO model ตรวจสอบว่าผู้ใช้งานใส่หน้ากากอนามัยหรือไม่ โดยตรวจสอบ label ที่ได้จากโมเดล
+
+Face Recognition:
+
+extract_embeddings: สกัด embedding ของใบหน้าจากภาพโดยใช้ InsightFace
+match_face: เปรียบเทียบ embedding ใหม่กับฐานข้อมูลที่เก็บไว้ (ในไฟล์ pickle) โดยใช้ cosine similarity
+process_face_recognition: รวบรวมผลลัพธ์ของการจับคู่ใบหน้าพร้อม bounding boxes และคะแนนความเหมือน
+Smile Detection (process_smile_detection):
+ใช้ Mediapipe face mesh ในการตรวจจับ landmark ของปากและคำนวณอัตราส่วนระหว่างความกว้างของปากและใบหน้า หากอัตราส่วนเกินค่าที่กำหนดถือว่ามีการยิ้ม
+
+Blink Detection (process_blink_detection):
+ตรวจจับการกะพริบตาโดยดูจากระยะห่างระหว่าง landmark บนและล่างของดวงตา ถ้าระยะห่างต่ำกว่า threshold ที่ตั้งไว้ ถือว่ามีกะพริบตา
+
+Head Turn Detection (process_head_turn_detection):
+ตรวจจับการหมุนหัวโดยวัดตำแหน่งของจมูกและตา (ซ้าย/ขวาและขึ้น/ลง) โดยมีการกำหนด threshold ในการตัดสินใจ
+
+Head Pose Estimation (process_head_pose_estimation):
+ใช้เทคนิค solvePnP ของ OpenCV เพื่อคำนวณองศาของหัว (pitch, yaw, roll) จาก landmark ของใบหน้า
+
+Face Embedding Extraction และ Storage:
+
+extract_embedding_from_image: สกัด embedding จากภาพใบหน้า
+save_embeddings และ load_embeddings: บันทึกและโหลด embeddings ที่เก็บไว้ในไฟล์ pickle
+get_face_embedding_from_frame: ดึง embedding จาก frame สำหรับการเปรียบเทียบใบหน้าใน endpoint
+4. API Endpoint และ Routing
+/process_frame (POST):
+รับข้อมูล JSON ที่ประกอบด้วยภาพ (เข้ารหัส base64) และชื่อฟีเจอร์ที่ต้องการประมวลผล เช่น "Face Recognition", "Smile Detection", "Blink Detection" เป็นต้น
+
+ทำการ decode ภาพ
+เรียกใช้ฟังก์ชันที่ตรงกับฟีเจอร์ที่ร้องขอ
+ส่งผลลัพธ์กลับในรูปแบบ JSON
+/compareface:
+Endpoint สำหรับเปรียบเทียบใบหน้าจากภาพ 2 ภาพ
+
+รับภาพจาก form (ทั้งแบบ GET และ POST)
+สกัด embedding จากแต่ละภาพและคำนวณ cosine similarity
+แสดงผลลัพธ์ใน template HTML พร้อมทั้งภาพที่ถูกเข้ารหัสเป็น Base64
+/upload:
+สำหรับอัปโหลดภาพเพื่อเพิ่มหรืออัปเดตข้อมูล embeddings ของผู้ใช้งาน
+
+รับชื่อผู้ใช้และไฟล์ภาพจาก form
+สกัด embedding จากภาพ
+บันทึก embedding ลงในไฟล์ pickle และรีเฟรชข้อมูลใน global variable เพื่อใช้ในงาน face recognition
+/ และ /compare_face_page:
+Routing สำหรับหน้าแรกและหน้าเปรียบเทียบใบหน้าในเว็บอินเตอร์เฟส
+
+5. การทำงานหลัก
+เมื่อเรียกใช้โปรเจค Flask นี้:
+
+ฝั่ง Frontend: ผู้ใช้สามารถเข้าถึงหน้าเว็บเพื่ออัปโหลดภาพ หรือเปรียบเทียบใบหน้าได้
+ฝั่ง Backend: เมื่อมีคำขอเข้ามา (ผ่าน endpoint ต่าง ๆ) โค้ดจะทำการ:
+ 1.รับและ decode ภาพที่ส่งเข้ามา
+ 2.ประมวลผลภาพด้วยฟังก์ชันที่เกี่ยวข้อง (เช่น สกัด embedding, ตรวจจับลักษณะใบหน้า, ตรวจจับการยิ้ม หรือกะพริบตา)
+ 3.ส่งผลลัพธ์กลับในรูปแบบ JSON หรือแสดงผลผ่าน HTML template
+
+
+
+
